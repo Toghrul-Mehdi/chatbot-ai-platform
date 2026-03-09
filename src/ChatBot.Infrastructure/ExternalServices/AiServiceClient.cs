@@ -77,6 +77,11 @@ public class AiServiceClient : IAiServiceClient
             _logger.LogError(ex, "AI service request timed out");
             return Result<ChatResponseDto>.Failure("AI service request timed out.");
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error communicating with AI service");
+            return Result<ChatResponseDto>.Failure("AI service is unavailable. Please try again later.");
+        }
     }
 
     /// <inheritdoc />

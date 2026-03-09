@@ -51,7 +51,7 @@ public class UserService : IUserService
             Id = Guid.NewGuid(),
             Username = request.Username,
             Email = request.Email,
-            PasswordHash = BCryptHash(request.Password),
+            PasswordHash = HashPassword(request.Password),
             CreatedAt = DateTime.UtcNow,
             IsActive = true
         };
@@ -113,17 +113,33 @@ public class UserService : IUserService
         });
     }
 
-    private static string BCryptHash(string password)
+    private static string HashPassword(string password)
     {
-        // Simple hash for in-memory storage; use BCrypt in production
-        using var sha = System.Security.Cryptography.SHA256.Create();
-        var bytes = System.Text.Encoding.UTF8.GetBytes(password);
-        var hash = sha.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
+        var salt = new byte[16];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(salt);
+
+        using var pbkdf2 = new System.Security.Cryptography.Rfc2898DeriveBytes(
+            password, salt, 100000, System.Security.Cryptography.HashAlgorithmName.SHA256);
+        var hash = pbkdf2.GetBytes(32);
+
+        var combined = new byte[48];
+        Array.Copy(salt, 0, combined, 0, 16);
+        Array.Copy(hash, 0, combined, 16, 32);
+        return Convert.ToBase64String(combined);
     }
 
-    private static bool VerifyPassword(string password, string hash)
+    private static bool VerifyPassword(string password, string storedHash)
     {
-        return BCryptHash(password) == hash;
+        var combined = Convert.FromBase64String(storedHash);
+        var salt = new byte[16];
+        Array.Copy(combined, 0, salt, 0, 16);
+
+        using var pbkdf2 = new System.Security.Cryptography.Rfc2898DeriveBytes(
+            password, salt, 100000, System.Security.Cryptography.HashAlgorithmName.SHA256);
+        var hash = pbkdf2.GetBytes(32);
+
+        return System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+            hash, combined.AsSpan(16));
     }
 }

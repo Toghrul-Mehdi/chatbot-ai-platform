@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ChatBot.API/ChatBot.API.csproj" />
+    <Project Path="src/ChatBot.Application/ChatBot.Application.csproj" />
+    <Project Path="src/ChatBot.Domain/ChatBot.Domain.csproj" />
+    <Project Path="src/ChatBot.Infrastructure/ChatBot.Infrastructure.csproj" />
+    <Project Path="src/ChatBot.Shared/ChatBot.Shared.csproj" />
+  </Folder>
+  <Project Path="ai-service/ai-service.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52">
+    <Build Project="false" />
+  </Project>
+</Solution>

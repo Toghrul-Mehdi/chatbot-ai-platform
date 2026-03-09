@@ -17,8 +17,8 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-# ASP.NET Core config files
-*appsettings*.json
+# ASP.NET Core config files (secrets only)
+appsettings.Production.json
 
 .claude/
 
